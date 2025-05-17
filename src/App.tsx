@@ -1,35 +1,86 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { use, useEffect, useState } from "react";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [pointerHistory, setPointerHistory] = useState<string[]>([]);
+  const [mouseHistory, setMouseHistory] = useState<string[]>([]);
+  const [touchHistory, setTouchHistory] = useState<string[]>([]);
+
+  const addPointerHistory = (event: string) => {
+    setPointerHistory((prev) => [...prev.slice(-19), event]);
+  };
+  const addMouseHistory = (event: string) => {
+    setMouseHistory((prev) => [...prev.slice(-19), event]);
+  };
+  const addTouchHistory = (event: string) => {
+    setTouchHistory((prev) => [...prev.slice(-19), event]);
+  };
+
+  useEffect(() => {
+    const events = ["pointerdown", "pointerup", "pointermove"];
+    const handler = (event: Event) => {
+      addPointerHistory(event.type);
+    };
+
+    events.forEach((eventName) => {
+      window.addEventListener(eventName, handler);
+    });
+
+    return () => {
+      events.forEach((eventName) => {
+        window.removeEventListener(eventName, handler);
+      });
+    };
+  }, []);
+
+  useEffect(() => {
+    const events = ["mousedown", "mouseup", "mousemove"];
+    const handler = (event: Event) => {
+      addMouseHistory(event.type);
+    };
+    events.forEach((eventName) => {
+      window.addEventListener(eventName, handler);
+    });
+    return () => {
+      events.forEach((eventName) => {
+        window.removeEventListener(eventName, handler);
+      });
+    };
+  }, []);
+  useEffect(() => {
+    const events = ["touchstart", "touchend", "touchmove"];
+    const handler = (event: Event) => {
+      addTouchHistory(event.type);
+    };
+    events.forEach((eventName) => {
+      window.addEventListener(eventName, handler);
+    });
+    return () => {
+      events.forEach((eventName) => {
+        window.removeEventListener(eventName, handler);
+      });
+    };
+  }, []);
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div style={{ display: "inline-block", margin: "10px" }}>
+        {pointerHistory.map((item) => {
+          return <div>{item}</div>;
+        })}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+      <div style={{ display: "inline-block", margin: "10px" }}>
+        {mouseHistory.map((item) => {
+          return <div>{item}</div>;
+        })}
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <div style={{ display: "inline-block", margin: "10px" }}>
+        {touchHistory.map((item) => {
+          return <div>{item}</div>;
+        })}
+      </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
